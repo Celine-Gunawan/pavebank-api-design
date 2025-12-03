@@ -1,4 +1,5 @@
-1. Client-Facing Section
+# 1. Client-Facing Section
+
 Welcome to the pave api bank design. 
 This document describes a minimal version of the Pave Bank account API, which allows clients to:
 - Create business accounts
@@ -7,20 +8,21 @@ This document describes a minimal version of the Pave Bank account API, which al
 - Withdraw funds to internal or external destinations
 - All requests and responses use JSON.
 
-2. API Documentation
+# 2. API Documentation
 
-2.2 Endpoints
+## 2.2 Endpoints
 
-2.2.1 Create Account
+### 2.2.1 Create Account
+
 POST /accounts
 
-Request
+**Request**
 {
     "business_id" : "ULID",
     "name" : "Account"
 }
 
-Response
+**Response**
 {
     "id" : "ULID",
     "business_id" : "ULID",
@@ -31,19 +33,22 @@ Response
     "updated_at" : "2025-02-02T12:00:00Z"
 }
 
-Status Codes
-- 201 Created - Account successfully created
-- 400 Bad Request - Missing fields or invalid input
-- 404 Not Found - Business ID doesn't exist
-- 500 Internal Server Error
+| Status Code | Meaning |
+|-------------|---------|
+| 201 Created | Account successfully created |
+| 400 Bad Request | Client sent invalid or missing input |
+| 404 Not Found | Business ID does not exist |
+| 500 Internal Server Error | Unexpected error on server |
 
-2.2.2 View Account
+
+### 2.2.2 View Account
+
 GET /accounts/{id}
 
-Request
+**Request**
 No request body as GET doesn't accept body
 
-Response
+**Response**
 {
     "id" : "ULID",
     "business_id" : "ULID",
@@ -61,15 +66,17 @@ Response
     "updated_at":2025-02-02T12:00:00Z
 }
 
-Status Codes
-- 200 OK - Account found
-- 400 Bad Request - Invalid ID format
-- 404 Not Found - Account not Found
+| Status Code | Meaning |
+|-------------|---------|
+| 200 OK | Account found |
+| 400 Bad Request | Client sent invalid id format |
+| 404 Not Found | Account does not exist |
 
-2.2.3 Create Deposit
+### 2.2.3 Create Deposit
+
 POST /accounts/{account_id}/deposit
 
-Request
+**Request**
 {
     "amount" : 10000,
     "currency" : "SGD",
@@ -77,7 +84,7 @@ Request
     "performed_by_user_id" : "ULID"
 }
 
-Response
+**Response**
 {
     "id": "ULID",
     "account_id": "ULID",
@@ -90,16 +97,18 @@ Response
     "created_at": "2025-02-02T12:05:00Z"
 }
 
-Status Codes
-- 201 Created - Deposit recorded
-- 400 Bad Request - Missing or invalid data
-- 404 Not Found - Account doesn't exist
-- 500 Internal Server Error
+| Status Code | Meaning |
+|-------------|---------|
+| 201 Created | Deposit recorded |
+| 400 Bad Request | Client sent invalid or missing fields |
+| 404 Not Found | Account does not exist |
+| 500 Internal Server Error | Unexpected error on server |
 
-2.2.4 Create Withdrawal
+### 2.2.4 Create Withdrawal
+
 POST /accounts/{account_id}/withdrawal
 
-Request
+**Request**
 {
   "amount": 50000,
   "currency": "SGD",
@@ -113,7 +122,7 @@ Request
   }
 }
 
-Response
+**Response**
 {
   "id": "ULID",
   "type": "withdrawal",
@@ -128,14 +137,16 @@ Response
   "created_at": "2025-02-02T12:10:00Z" 
 }
 
-Status Codes
-- 201 Created - Withdrawal recorded
-- 400 bad request - Missing or invalid data
-- 404 Not Found - Account doesn't exist
-- 422 Unprocessable Entity - Insufficient funds
-- 500 Internal Server Errror
+| Status Code | Meaning |
+|-------------|---------|
+| 201 Created | Withdrawal recorded |
+| 400 Bad Request | Client sent invalid or missing fields |
+| 404 Not Found | Account does not exist |
+| 422 Unprocessable Entity | Insufficient funds |
+| 500 Internal Server Error | Unexpected error on server |
 
-2.3 Error Format
+## 2.3 Error Format
+
 {
   "error": {
     "code": "invalid_request",
@@ -143,17 +154,18 @@ Status Codes
   }
 }
 
-Status Code	Meaning
-- 400 Bad Request - Client sent invalid or missing fields
-- 401 Unauthorized - Missing or invalid authentication token
-- 404 Not Found - Account, business, or transaction does not exist
-- 409 Conflict - Duplicate request or constraint violation
-- 422 Unprocessable Entity - Insufficient funds, invalid state
-- 500 Internal Server Error - Unexpected error on server
+| Status Code | Meaning |
+|-------------|---------|
+| 400 Bad Request | Client sent invalid or missing fields |
+| 401 Unauthorized | Missing or invalid authentication token |
+| 404 Not Found | Account, business, or transaction does not exist |
+| 409 Conflict | Duplicate request or constraint violation |
+| 422 Unprocessable Entity | Insufficient funds, invalid state |
+| 500 Internal Server Error | Unexpected error on server |
 
-3. Engineering Notes
-3.1 Data Models
-3.1.1 Account
+# 3. Engineering Notes
+## 3.1 Data Models
+### 3.1.1 Account
 The data model represents a business-owned financial account that supports multi-currency balances, subaccounts, and full lifecycle management.
 
 type Account struct {
@@ -168,7 +180,7 @@ type Account struct {
     UpdatedAt     time.Time     `json:"updated_at"`
 }
 
-3.1.2 Transaction
+### 3.1.2 Transaction
 The data model represents any financial movement: deposits, withdrawals, and internal transfers.
 
 type Transaction struct {
@@ -185,17 +197,17 @@ type Transaction struct {
     CreatedAt            time.Time            `json:"created_at"`
 }
 
-3.2 Identifier Strategy
+## 3.2 Identifier Strategy
 - ULID for internal IDs (globally unique)
 - Snowflake for account numbers (numeric and customer-friendly)
 - Balances array support multicurrency
 - Subaccounts allow internal organization
 - Timestamps support auditability 
 
-3.3 Money Representation
+## 3.3 Money Representation
 - All values stored in int64 minor units to avoid floating-point errors.
 
-3.4 Business Rules & Assumptions
+## 3.4 Business Rules & Assumptions
 - Valid ULIDs required for all IDs
 - Amount must be a positive integer
 - Withdrawals require sufficient balance
@@ -205,80 +217,90 @@ type Transaction struct {
 - AccountNumber generated via Snowflake
 - Timestamps follow UTC
 
-3.5 Edge Cases
-3.5.1 Insufficient funds 
-Trigger:
+## 3.5 Edge Cases
+
+### 3.5.1 Insufficient funds 
+
+**Trigger:**
 Account SGD balance = 10,000
 User request withdrawal of 50,000
 
-API Response
+**API Response**
 {
   "error": {
     "code": "insufficient_funds",
     "message": "The account does not have sufficient balance to complete this withdrawal."
   }
 }
+
 Status Code: 422 Unprocessable Entity
 
-3.5.2 Missing fields 
-Trigger:
+### 3.5.2 Missing fields 
+
+**Trigger:**
 If a required field is missing, the request is invalid.
 
-API Response
+**API Response**
 {
   "error": {
     "code": "invalid_request",
     "message": "Field 'missing' is required."
   }
 }
+
 Status Code: 400 Bad Request
 
-3.5.3 Invalid ULID 
-Trigger:
+### 3.5.3 Invalid ULID 
+
+**Trigger:**
 invalid id 
 
-API Response
+**API Response**
 {
   "error": {
     "code": "invalid",
     "message": "The provided account ID is not a valid ULID"
   }
 }
+
 Status Code: 400 Bad Request
 
-3.5.4 Invalid external bank details 
-Trigger:
+### 3.5.4 Invalid external bank details 
+
+**Trigger:**
 The information for the details is invalid
 
-API Response
+**API Response**
 {
   "error": {
     "code": "invalid_external_details",
     "message": "External bank details are incomplete."
   }
 }
+
 Status Code: 400 Bad Request
 
-3.5.5 Both destination and external details provided
-Trigger:
+### 3.5.5 Both destination and external details provided
+
+*Trigger:**
 There is details for both internal bank account and external bank account.
 
-API Response
+**API Response**
 {
   "error": {
     "code": "invalid_request",
     "message": "Provide either destination_account_id or external_bank_details."
   }
 }
+
 Status Code: 400 Bad Request
 
-3.5.6
-Neither destination nor external details provided
+### 3.5.6 Neither destination nor external details provided
 
-Trigger 
+**Trigger** 
 Missing field in either desination or external bank details
 
-API Response
+**API Response**
 {
   "error": {
     "code": "missing_destination",
@@ -288,11 +310,12 @@ API Response
 
 Status Code: 400 Bad Request
 
-3.5.7 Currency Mismatch
-Trigger:
+### 3.5.7 Currency Mismatch
+
+**Trigger:**
 Account tries to deposit USD when only having SGD
 
-API Response:
+**API Response:**
 {
   "error": {
     "code": "currency_not_supported",
@@ -302,11 +325,12 @@ API Response:
 
 Status Code: 422 Unprocessable Entity
 
-3.5.8 Negative or Zero Amount
-Trigger: 
+### 3.5.8 Negative or Zero Amount
+
+**Trigger:** 
 Amount: -500 
 
-API Response: 
+**API Response:** 
 {
   "error": {
     "code": "invalid_amount",
