@@ -17,12 +17,14 @@ This document describes a minimal version of the Pave Bank account API, which al
 POST /accounts
 
 **Request**
+
 {
     "business_id" : "ULID",
     "name" : "Account"
 }
 
 **Response**
+
 {
     "id" : "ULID",
     "business_id" : "ULID",
@@ -46,9 +48,11 @@ POST /accounts
 GET /accounts/{id}
 
 **Request**
+
 No request body as GET doesn't accept body
 
 **Response**
+
 {
     "id" : "ULID",
     "business_id" : "ULID",
@@ -77,6 +81,7 @@ No request body as GET doesn't accept body
 POST /accounts/{account_id}/deposit
 
 **Request**
+
 {
     "amount" : 10000,
     "currency" : "SGD",
@@ -85,6 +90,7 @@ POST /accounts/{account_id}/deposit
 }
 
 **Response**
+
 {
     "id": "ULID",
     "account_id": "ULID",
@@ -109,6 +115,7 @@ POST /accounts/{account_id}/deposit
 POST /accounts/{account_id}/withdrawal
 
 **Request**
+
 {
   "amount": 50000,
   "currency": "SGD",
@@ -123,6 +130,7 @@ POST /accounts/{account_id}/withdrawal
 }
 
 **Response**
+
 {
   "id": "ULID",
   "type": "withdrawal",
@@ -166,6 +174,7 @@ POST /accounts/{account_id}/withdrawal
 # 3. Engineering Notes
 ## 3.1 Data Models
 ### 3.1.1 Account
+
 The data model represents a business-owned financial account that supports multi-currency balances, subaccounts, and full lifecycle management.
 
 type Account struct {
@@ -181,6 +190,7 @@ type Account struct {
 }
 
 ### 3.1.2 Transaction
+
 The data model represents any financial movement: deposits, withdrawals, and internal transfers.
 
 type Transaction struct {
@@ -222,10 +232,12 @@ type Transaction struct {
 ### 3.5.1 Insufficient funds 
 
 **Trigger:**
+
 Account SGD balance = 10,000
 User request withdrawal of 50,000
 
 **API Response**
+
 {
   "error": {
     "code": "insufficient_funds",
@@ -238,9 +250,11 @@ Status Code: 422 Unprocessable Entity
 ### 3.5.2 Missing fields 
 
 **Trigger:**
+
 If a required field is missing, the request is invalid.
 
 **API Response**
+
 {
   "error": {
     "code": "invalid_request",
@@ -253,9 +267,11 @@ Status Code: 400 Bad Request
 ### 3.5.3 Invalid ULID 
 
 **Trigger:**
+
 invalid id 
 
 **API Response**
+
 {
   "error": {
     "code": "invalid",
@@ -268,9 +284,11 @@ Status Code: 400 Bad Request
 ### 3.5.4 Invalid external bank details 
 
 **Trigger:**
+
 The information for the details is invalid
 
 **API Response**
+
 {
   "error": {
     "code": "invalid_external_details",
@@ -282,10 +300,12 @@ Status Code: 400 Bad Request
 
 ### 3.5.5 Both destination and external details provided
 
-*Trigger:**
+**Trigger:**
+
 There is details for both internal bank account and external bank account.
 
 **API Response**
+
 {
   "error": {
     "code": "invalid_request",
@@ -298,9 +318,11 @@ Status Code: 400 Bad Request
 ### 3.5.6 Neither destination nor external details provided
 
 **Trigger** 
+
 Missing field in either desination or external bank details
 
 **API Response**
+
 {
   "error": {
     "code": "missing_destination",
@@ -313,9 +335,11 @@ Status Code: 400 Bad Request
 ### 3.5.7 Currency Mismatch
 
 **Trigger:**
+
 Account tries to deposit USD when only having SGD
 
 **API Response:**
+
 {
   "error": {
     "code": "currency_not_supported",
@@ -328,9 +352,11 @@ Status Code: 422 Unprocessable Entity
 ### 3.5.8 Negative or Zero Amount
 
 **Trigger:** 
+
 Amount: -500 
 
 **API Response:** 
+
 {
   "error": {
     "code": "invalid_amount",
