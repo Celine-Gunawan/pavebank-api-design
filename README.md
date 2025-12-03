@@ -72,7 +72,7 @@ No request body as GET doesn't accept body
     "subaccounts" : [],
     "status": "active",
     "created_at": "2025-02-02T12:00:00Z",
-    "updated_at":2025-02-02T12:00:00Z
+    "updated_at": "2025-02-02T12:00:00Z"
 }
 ```
 
@@ -149,7 +149,7 @@ POST /accounts/{account_id}/withdrawal
   "type": "withdrawal",
   "account_id": "ULID",
   "destination_account_id": "ULID or null",
-  "external_bank_details": { ... or null },
+  "external_bank_details": { },
   "amount": 50000,
   "currency": "SGD",
   "description": "External withdrawal",
@@ -193,7 +193,7 @@ POST /accounts/{account_id}/withdrawal
 
 The data model represents a business-owned financial account that supports multi-currency balances, subaccounts, and full lifecycle management.
 
-```json
+```go
 type Account struct {
     ID            string        `json:"id"`              
     BusinessID    string        `json:"business_id"`     
@@ -211,7 +211,7 @@ type Account struct {
 
 The data model represents any financial movement: deposits, withdrawals, and internal transfers.
 
-```json
+```go
 type Transaction struct {
     ID                   string               `json:"id"`                     
     Type                 string               `json:"type"`                   
