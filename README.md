@@ -18,13 +18,16 @@ POST /accounts
 
 **Request**
 
+```json
 {
     "business_id" : "ULID",
     "name" : "Account"
 }
+```
 
 **Response**
 
+```json
 {
     "id" : "ULID",
     "business_id" : "ULID",
@@ -34,6 +37,7 @@ POST /accounts
     "created_at" : "2025-02-02T12:00:00Z",
     "updated_at" : "2025-02-02T12:00:00Z"
 }
+```
 
 | Status Code | Meaning |
 |-------------|---------|
@@ -53,6 +57,7 @@ No request body as GET doesn't accept body
 
 **Response**
 
+```json
 {
     "id" : "ULID",
     "business_id" : "ULID",
@@ -69,6 +74,7 @@ No request body as GET doesn't accept body
     "created_at": "2025-02-02T12:00:00Z",
     "updated_at":2025-02-02T12:00:00Z
 }
+```
 
 | Status Code | Meaning |
 |-------------|---------|
@@ -82,15 +88,18 @@ POST /accounts/{account_id}/deposit
 
 **Request**
 
+```json
 {
     "amount" : 10000,
     "currency" : "SGD",
     "description" : "Deposit",
     "performed_by_user_id" : "ULID"
 }
+```
 
 **Response**
 
+```json
 {
     "id": "ULID",
     "account_id": "ULID",
@@ -102,6 +111,7 @@ POST /accounts/{account_id}/deposit
     "status": "completed", 
     "created_at": "2025-02-02T12:05:00Z"
 }
+```
 
 | Status Code | Meaning |
 |-------------|---------|
@@ -116,6 +126,7 @@ POST /accounts/{account_id}/withdrawal
 
 **Request**
 
+```json
 {
   "amount": 50000,
   "currency": "SGD",
@@ -128,9 +139,11 @@ POST /accounts/{account_id}/withdrawal
     "country": "SG"
   }
 }
+```
 
 **Response**
 
+```json
 {
   "id": "ULID",
   "type": "withdrawal",
@@ -144,6 +157,7 @@ POST /accounts/{account_id}/withdrawal
   "status": "completed",
   "created_at": "2025-02-02T12:10:00Z" 
 }
+```
 
 | Status Code | Meaning |
 |-------------|---------|
@@ -155,12 +169,14 @@ POST /accounts/{account_id}/withdrawal
 
 ## 2.3 Error Format
 
+```json
 {
   "error": {
     "code": "invalid_request",
     "message": "The currency field is required."
   }
 }
+```
 
 | Status Code | Meaning |
 |-------------|---------|
@@ -177,6 +193,7 @@ POST /accounts/{account_id}/withdrawal
 
 The data model represents a business-owned financial account that supports multi-currency balances, subaccounts, and full lifecycle management.
 
+```json
 type Account struct {
     ID            string        `json:"id"`              
     BusinessID    string        `json:"business_id"`     
@@ -188,11 +205,13 @@ type Account struct {
     CreatedAt     time.Time     `json:"created_at"`
     UpdatedAt     time.Time     `json:"updated_at"`
 }
+```
 
 ### 3.1.2 Transaction
 
 The data model represents any financial movement: deposits, withdrawals, and internal transfers.
 
+```json
 type Transaction struct {
     ID                   string               `json:"id"`                     
     Type                 string               `json:"type"`                   
@@ -206,6 +225,7 @@ type Transaction struct {
     Description          string               `json:"description"`        
     CreatedAt            time.Time            `json:"created_at"`
 }
+```
 
 ## 3.2 Identifier Strategy
 - ULID for internal IDs (globally unique)
@@ -238,12 +258,14 @@ User request withdrawal of 50,000
 
 **API Response**
 
+```json
 {
   "error": {
     "code": "insufficient_funds",
     "message": "The account does not have sufficient balance to complete this withdrawal."
   }
 }
+```
 
 Status Code: 422 Unprocessable Entity
 
@@ -255,12 +277,14 @@ If a required field is missing, the request is invalid.
 
 **API Response**
 
+```json
 {
   "error": {
     "code": "invalid_request",
     "message": "Field 'missing' is required."
   }
 }
+```
 
 Status Code: 400 Bad Request
 
@@ -272,12 +296,14 @@ invalid id
 
 **API Response**
 
+```json
 {
   "error": {
     "code": "invalid",
     "message": "The provided account ID is not a valid ULID"
   }
 }
+```
 
 Status Code: 400 Bad Request
 
@@ -289,12 +315,14 @@ The information for the details is invalid
 
 **API Response**
 
+```json
 {
   "error": {
     "code": "invalid_external_details",
     "message": "External bank details are incomplete."
   }
 }
+```
 
 Status Code: 400 Bad Request
 
@@ -306,12 +334,14 @@ There is details for both internal bank account and external bank account.
 
 **API Response**
 
+```json
 {
   "error": {
     "code": "invalid_request",
     "message": "Provide either destination_account_id or external_bank_details."
   }
 }
+```
 
 Status Code: 400 Bad Request
 
@@ -323,12 +353,14 @@ Missing field in either desination or external bank details
 
 **API Response**
 
+```json
 {
   "error": {
     "code": "missing_destination",
     "message": "Withdrawal must specify a destination account or external bank details."
   }
-}
+} 
+```
 
 Status Code: 400 Bad Request
 
@@ -340,12 +372,14 @@ Account tries to deposit USD when only having SGD
 
 **API Response:**
 
+```json
 {
   "error": {
     "code": "currency_not_supported",
     "message": "This account does not support the provided currency."
   }
 }
+```
 
 Status Code: 422 Unprocessable Entity
 
@@ -357,11 +391,13 @@ Amount: -500
 
 **API Response:** 
 
+```json
 {
   "error": {
     "code": "invalid_amount",
     "message": "Transaction amount must be a positive integer."
   }
 }
+```
 
 Status Code: 400 Bad Request
